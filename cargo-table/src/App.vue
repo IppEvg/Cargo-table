@@ -18,7 +18,7 @@
     <div class="redactTable"><div><button class="buttonsWithoutBorder">Сохранить изменения</button></div> <div class="rightGroup"><button><img src="./assets/svg/combined-shape.svg" alt="settingsIcon"></button></div></div>
     <AgGridVue class="ag-theme-quartz" style="width: 100%; height: 453px"
       :rowData="rowData"
-      :columnDefs="colDefs"
+      :columnDefs="columnDefs"
       :defaultColDef="defaultColDef"
     >
     </AgGridVue>
@@ -28,52 +28,97 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+// import { ref } from 'vue';
 import "ag-grid-community/styles/ag-grid.css"; 
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { AgGridVue } from "ag-grid-vue3"; 
 export default {
   name: 'App',
-
+  data() {
+    return {
+      columnDefs: null,
+      rowData: null, 
+    }
+  },
   components: {
     AgGridVue
   },
   methods:{
 
   },
-  setup()  {
-            const rowData = ref([
-    {"": " " , " ": " ", "Наименование еденицы": "Мраморный щебень фр. 2-5 мм, 25кг",
-    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебе","Итого":"1231"
-  },
-    { make: "Ford", model: "F-Series", price: 33850, electric: false,rowDrag : true },
-    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-    
-  ])
-
-  // Column Definitions: Defines & controls grid columns.
-  const colDefs = ref([
-    { field: ""},
+  beforeMount() {
+    this.columnDefs = [
+    { field: "staticArray",
+      headerName: '',
+      
+    },
     { field: "" },
-    { field: "Наименование еденицы" },
+    { field: "Наименование единицы",cellEditorPopup:true},
     { field: "Цена" },
     { field: "Кол-во" },
     { field: "Название товара" },
     { field: "Итого" },
-  ])
-const defaultColDef = ref({
-      editable: false,
-      filter: false,
-     sortable: false 
-    });
-  return {
-    rowData,
-    colDefs,
-    defaultColDef
-  }
+    ]
+    this.rowData = [
+    {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
   },
+    {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+  },
+    {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+  },
+    {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+  },
+    ]
+  }
 }
+  // setup()  {
+  //           const rowData = ref([
+  //   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+  //   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+  // },
+  //   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+  //   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+  // },
+  //   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+  //   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+  // },
+  //   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+  //   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+  // },
+    
+    
+  // ])
+
+  // Column Definitions: Defines & controls grid columns.
+//   const colDefs = ref([
+//     { field: "staticArray",
+//       headerName: '1',
+//       cellClass: ['my-class1','my-class2']
+//     },
+//     { field: "" },
+//     { field: "Наименование единицы",editable:true,rowSelection:"multiple",
+//       },
+//     { field: "Цена" },
+//     { field: "Кол-во" },
+//     { field: "Название товара" },
+//     { field: "Итого" },
+//   ])
+// const defaultColDef = ref({
+//       editable: true,
+//       filter: false,
+//      sortable: false 
+//     });
+//   return {
+//     rowData,
+//     colDefs,
+//     defaultColDef
+//   }
+//   },
+// }
 </script>
 
 <style lang="scss">
