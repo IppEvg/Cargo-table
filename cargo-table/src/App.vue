@@ -12,20 +12,67 @@
     <div class="rightGroup"><button><img src="./assets/svg/combined-shape.svg" alt="settingsIcon"></button></div>
   </div>
   <div class="newRow">
-    <button class="adderRow"><span class="plus">+</span> Добавить строку</button>
+    <button class="adderRow" @click="addNewRow"><span class="plus">+</span> Добавить строку</button>
+  </div>
+  <div class="wrapTable">
+    <div class="redactTable"><div><button class="buttonsWithoutBorder">Сохранить изменения</button></div> <div class="rightGroup"><button><img src="./assets/svg/combined-shape.svg" alt="settingsIcon"></button></div></div>
+    <AgGridVue class="ag-theme-quartz" style="width: 100%; height: 453px"
+      :rowData="rowData"
+      :columnDefs="colDefs"
+      :defaultColDef="defaultColDef"
+    >
+    </AgGridVue>
   </div>
 </section>
 </div>
 </template>
 
 <script>
-
-
+import { ref } from 'vue';
+import "ag-grid-community/styles/ag-grid.css"; 
+import "ag-grid-community/styles/ag-theme-quartz.css";
+import { AgGridVue } from "ag-grid-vue3"; 
 export default {
   name: 'App',
-  components: {
 
+  components: {
+    AgGridVue
+  },
+  methods:{
+
+  },
+  setup()  {
+            const rowData = ref([
+    {"": " " , " ": " ", "Наименование еденицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебе","Итого":"1231"
+  },
+    { make: "Ford", model: "F-Series", price: 33850, electric: false,rowDrag : true },
+    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+    
+  ])
+
+  // Column Definitions: Defines & controls grid columns.
+  const colDefs = ref([
+    { field: ""},
+    { field: "" },
+    { field: "Наименование еденицы" },
+    { field: "Цена" },
+    { field: "Кол-во" },
+    { field: "Название товара" },
+    { field: "Итого" },
+  ])
+const defaultColDef = ref({
+      editable: false,
+      filter: false,
+     sortable: false 
+    });
+  return {
+    rowData,
+    colDefs,
+    defaultColDef
   }
+  },
 }
 </script>
 
@@ -48,9 +95,11 @@ export default {
 .wrap{
   display: flex;
   background-color: #fbfcfd;
+  width: 1728px;
 }
 .wrapSection{
   margin: 25px;
+  width:100%;
 }
 .leftAside{
   background-color: #000000;
@@ -90,6 +139,7 @@ export default {
 .rightGroup{
   max-height:15px ;
   align-self: center;
+  margin-right: 15px;
   button{
     background-color: rgba(255, 255, 255, 0);
     border: none;
@@ -118,4 +168,22 @@ font-size: 14px;
   padding-right: 7px ;
 height: 11px;
 }
+.wrapTable{
+  margin-top: 25px;
+  background-color: #fff;
+}
+.redactTable{
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-top: 10px;
+  gap: 20px;
+}
+.buttonsWithoutBorder{
+  border: none;
+  color: #a6b7d4;
+  background-color: unset;
+}
+
+
 </style>
