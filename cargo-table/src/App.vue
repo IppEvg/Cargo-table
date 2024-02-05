@@ -5,14 +5,14 @@
   <h1 class="title">Проведение ТО и мелкий ремонт</h1>
   <div class="links">
     <div class="leftGroup">
-      <a href="">Общее</a>
-      <a class="secondLink" href="">Товары</a>
-      <a href="">Доп. расходы</a>
+      <a href="#">Общее</a>
+      <a class="secondLink" href="#">Товары</a>
+      <a href="#">Доп. расходы</a>
     </div>
     <div class="rightGroup"><button><img src="./assets/svg/combined-shape.svg" alt="settingsIcon"></button></div>
   </div>
   <div class="newRow">
-    <button class="adderRow" @click="addNewRow"><span class="plus">+</span> Добавить строку</button>
+    <button class="adderRow" @click="addNewCol"><span class="plus">+</span> Добавить строку</button>
   </div>
   <div class="wrapTable">
     <div class="redactTable"><div><button class="buttonsWithoutBorder">Сохранить изменения</button></div> <div class="rightGroup"><button><img src="./assets/svg/combined-shape.svg" alt="settingsIcon"></button></div></div>
@@ -20,6 +20,10 @@
       :rowData="rowData"
       :columnDefs="columnDefs"
       :defaultColDef="defaultColDef"
+      :rowDragManaged="true"
+      :enableCellChangeFlash="true"
+      :getRowId="getRowId"
+      @cell-value-changed="onCellValueChanged"
     >
     </AgGridVue>
   </div>
@@ -38,43 +42,64 @@ export default {
     return {
       columnDefs: null,
       rowData: null, 
+      options:["Мраморный щебень фр. 30 мм, 40кг","Мраморный щебень фр. 2-5 мм, 25кг","Мраморный щебень фр. 4-8 мм, 25кг","Мраморный щебень фр. 3-10 мм, 25кг"]
     }
   },
   components: {
     AgGridVue
   },
   methods:{
-
+  addNewCol(){
+    this.rowData = [...this.rowData, {"index": "", " ":"","Наименование единицы": this.options[0],
+    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+  }, ]
+  }
   },
-  beforeMount() {
+  computed:{
+    fI(e){
+     return this.rowData.findIndex(e)
+    }
+  },
+  mounted() {
+
     this.columnDefs = [
-    { field: "staticArray",
+    { field: "index",
+    width:40,
+    
+  },
+    { field: "",
       headerName: '',
-      
+      rowDrag : true,
+      width:40,
     },
-    { field: "" },
-    { field: "Наименование единицы",cellEditorPopup:true},
-    { field: "Цена" },
-    { field: "Кол-во" },
-    { field: "Название товара" },
-    { field: "Итого" },
+    { field: "Наименование единицы", editable: true,
+      filter: false,
+     sortable: false ,cellEditor: 'agSelectCellEditor',cellEditorParams: { values: [this.options[0],this.options[1],this.options[2],this.options[3]] },
+    },
+    { field: "Цена", editable: true,cellEditor: 'agTextCellEditor',},
+    { field: "Кол-во", editable: true,cellEditor: 'agTextCellEditor',},
+    { field: "Название товара",editable: true,cellEditor: 'agTextCellEditor', },
+    { field: "Итого",},
     ]
     this.rowData = [
-    {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+    {"index": "", " ":"","Наименование единицы": this.options[0],
     "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
   },
-    {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
-    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+    {"index": "" , " ": "", "Наименование единицы":this.options[0],
+    "Цена" : "1500", "Кол-во":"10","Название товара":"Мраморный щебень","Итого":"1231"
   },
-    {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
-    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+    {"index": "" , " ":"", "Наименование единицы": this.options[0],
+    "Цена" : "1000", "Кол-во":"5","Название товара":"Мраморный щебень","Итого":"1231"
   },
-    {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
-    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+    {"index": "" , " ": "", "Наименование единицы": this.options[0],
+    "Цена" : "860", "Кол-во":"10","Название товара":"Мраморный щебень","Итого":"1231"
   },
     ]
-  }
+
+  },
+  
 }
+
   // setup()  {
   //           const rowData = ref([
   //   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
@@ -169,6 +194,7 @@ export default {
   text-align: left;
   margin-left: 25px;
   margin-bottom: 25px;
+  text-transform: none;
   a{
     text-decoration: none;
     color:#1253a2 ;
@@ -179,6 +205,7 @@ export default {
   .secondLink{
     margin-left: 20px;
     margin-right: 25px;
+    text-transform: none;
   }
 }
 .rightGroup{
