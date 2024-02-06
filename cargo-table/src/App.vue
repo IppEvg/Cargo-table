@@ -16,13 +16,14 @@
   </div>
   <div class="wrapTable">
     <div class="redactTable"><div><button class="buttonsWithoutBorder">Сохранить изменения</button></div> <div class="rightGroup"><button><img src="./assets/svg/combined-shape.svg" alt="settingsIcon"></button></div></div>
+   
     <AgGridVue class="ag-theme-quartz" style="width: 100%; height: 453px"
       :rowData="rowData"
       :columnDefs="columnDefs"
+      :onGridReady="onGridReady"
       :rowDragManaged=true
       :enableCellChangeFlash=true
-      :getRowNodeId="getRowNodeId"
-          @rowDragEnd="updateIndexColumn"
+          @modelUpdated="updateIndexes"
     >
     </AgGridVue>
   </div>
@@ -39,13 +40,14 @@ export default {
   name: 'App',
   data() {
     return {
+      numberData:null,
+      singleColData:null,
       columnDefs: null,
       rowData: null, 
       options:["Мраморный щебень фр. 30 мм, 40кг",
       "Мраморный щебень фр. 2-5 мм, 25кг",
       "Мраморный щебень фр. 4-8 мм, 25кг",
       "Мраморный щебень фр. 3-10 мм, 25кг"],
-      
     }
   },
   components: {
@@ -56,32 +58,66 @@ export default {
     this.rowData = [...this.rowData, {"index": "", " ":"","Наименование единицы": this.options[0],
     "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"}, ]
   },
-  getRowNodeId(data) {
-      return data.id;
-    },
-    updateIndexColumn() {
-      console.log(this.rowData.ownKeys());
-    //   const allRowNodes = this.gridApi.getModel().getRowNodes()
-    //   allRowNodes.forEach((node, index) => {
-    //     const data = node.data;
-        
-    //     data.index = index + 1;
-    //   });
-    //   this.gridApi.redrawRows();
+  // onGridReady(params) {
+  //     const gridApi = params.api;
+  //     const columnApi = params.columnApi;
+      // Получить список всех столбцов
+      // const allColumns = columnApi.getAllColumns();
+
+      // Пройти по всем столбцам и установить свойство rowDrag только для выбранных столбцов
+      // allColumns.forEach((column) => {
+      //   if (column.getColDef().field === 'index' ) {
+      //     column.setRowDrag(false);
+      //   }
+      // });
+
+      // Обновить грид
+    //   gridApi.refreshHeader();
     // },
-  }},
- 
+getRowNodeId(data){
+  return data.id
+},
+    updateIndexes(params) {
+    if (this.rowData){
+this.rowData.forEach((e) => { 
+console.log(params.rowIndex);
+       e.index = params.rowIndex
+      })
+    }
+  // const allRowNodes = params.api.getModel().getRowNodes()
+  //     allRowNodes.forEach((node, index) => { 
+  //       const data = node.data; 
+         
+  //       data.index = index + 1; 
+  //     }); 
+  //     this.gridApi.redrawRows(); 
+    
+  
+      // const gridApi = params.api;
+    //   const columnApi = params.columnApi;
+    // const allRowNodes = data.RowNodes
+      
+return this.rowData
+      }
+    },
+ computed:{
+  
+
+ },
+
   mounted() {
     
     this.columnDefs = [
     { field: 'index',
     headerName: '',
     width:40,
-    valueGetter:params => params.node.rowIndex
+  immutableData: true,editable: true,
+  valueGetter:params => params.node.rowIndex 
   },
-    { field: "",
+    { field: "id",
       headerName: '',
       rowDrag : true,
+      suppressDragLeaveHidesColumns: true,
       width:40,
     },
     { field: "Наименование единицы", editable: true,
@@ -92,25 +128,27 @@ export default {
     { field: "Кол-во", editable: true,cellEditor: 'agTextCellEditor',},
     { field: "Название товара",editable: true,cellEditor: 'agTextCellEditor', },
     { field: "Итого",},
-    ],
+    ]
     this.rowData = [
-    {"index": "", " ":"","Наименование единицы": this.options[0],
+    {"index": "1", " ":"","Наименование единицы": this.options[0],
     "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
   },
-    {"index": "" , " ": "", "Наименование единицы":this.options[0],
+    {"index": "2" , " ": "", "Наименование единицы":this.options[0],
     "Цена" : "1500", "Кол-во":"10","Название товара":"Мраморный щебень","Итого":"1231"
   },
-    {"index": "" , " ":"", "Наименование единицы": this.options[0],
+    {"index": "3" , " ":"", "Наименование единицы": this.options[0],
     "Цена" : "1000", "Кол-во":"5","Название товара":"Мраморный щебень","Итого":"1231"
   },
-    {"index": "" , " ": "", "Наименование единицы": this.options[0],
+    {"index": "4" , " ": "", "Наименование единицы": this.options[0],
     "Цена" : "860", "Кол-во":"10","Название товара":"Мраморный щебень","Итого":"1231"
   },
-    ],
-this.gridApi = this.$refs.agGrid.api;
+    ]
   }
-  
 }
+
+
+  
+
 
   // setup()  {
   //           const rowData = ref([
