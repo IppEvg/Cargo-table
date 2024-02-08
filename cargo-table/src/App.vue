@@ -1,194 +1,203 @@
 <template>
-<div class="wrap">
-<aside class="leftAside"></aside>
-<section class="wrapSection">
-  <h1 class="title">Проведение ТО и мелкий ремонт</h1>
-  <div class="links">
-    <div class="leftGroup">
-      <a href="#">Общее</a>
-      <a class="secondLink" href="#">Товары</a>
-      <a href="#">Доп. расходы</a>
-    </div>
-    <div class="rightGroup">
-      <button  @click="showListMenu" class="buttonMenu"><img src="./assets/svg/combined-shape.svg" alt="settingsIcon"></button>
-      <div v-show="showList" class="listOptions" >
-        <button class="buttonColumnMenu" v-for="item,index in listMenu" :key="index">
-          <div class="wrapButtonColumnMenu">
-            <button @click="showListNewColumns(item)" class="buttonColumnMenu">
-              {{item.name}}
-              <div v-if="!item.showListColumns">&gt;</div>
-              <div v-else> &lt;</div>  
-            </button>
-            <div v-if="item.showListColumns" class="listColumn">
-              <div v-for="col,idx in item.listColumns" :key="idx" >
-                <input  type="checkbox" id="idx" :checked="col.isShow"/>	&nbsp; 
-                <label for="idx">{{col.col}}</label>
+  <div class="wrap">
+    <aside class="leftAside"></aside>
+    <section class="wrapSection">
+      <h1 class="title">Проведение ТО и мелкий ремонт</h1>
+      <div class="links">
+        <div class="leftGroup">
+          <a href="#">Общее</a>
+          <a class="secondLink" href="#">Товары</a>
+          <a href="#">Доп. расходы</a>
+        </div>
+        <div class="rightGroup">
+          <button @click="showListMenu" class="buttonMenu"><img src="./assets/svg/combined-shape.svg"
+              alt="settingsIcon"></button>
+          <div v-show="showList" class="listOptions">
+            <button class="buttonColumnMenu" v-for="item, index in listMenu" :key="index">
+              <div class="wrapButtonColumnMenu">
+                <button @click="showListNewColumns(item)" class="buttonColumnMenu">
+                  {{ item.name }}
+                  <div v-if="!item.showListColumns">&gt;</div>
+                  <div v-else> &lt;</div>
+                </button>
+                <div v-if="item.showListColumns" class="listColumn">
+                  <div v-for="column in item.listColumns" :key="column.field">
+                    <input type="checkbox" id="idx" @change="onRowDataUpdated(column.field)" checked="true" />
+                    &nbsp;
+                    <label for=" idx">{{ column.field }}</label>
+                  </div>
+                </div>
               </div>
-            </div> 
+            </button>
           </div>
-        </button>
-      
+        </div>
       </div>
-    </div>
-  </div>
-  <div class="newRow">
-    <button class="adderRow" @click="addNewRow"><span class="plus">+</span> Добавить строку</button>
-  </div>
-  <div class="wrapTable">
-    <div class="redactTable">
-      <div>
-        <button class="buttonsWithoutBorder">Сохранить изменения</button>
-      </div> 
-      <div  class="rightGroup">
-        <button class="buttonMenu">
-          <img  src="./assets/svg/combined-shape.svg" alt="settingsIcon">
-        </button>
+      <div class="newRow">
+        <button class="adderRow" @click="addNewRow"><span class="plus">+</span> Добавить строку</button>
       </div>
-    </div>
-   
-    <AgGridVue class="ag-theme-quartz" style="width: 100%; height: 453px"
-      :rowData="rowData"
-      :columnDefs="columnDefs"
-      :onGridUpdate=true
-      :rowDragManaged=true
-      :getRowNodeId="getRowNodeId"
-      :enableCellChangeFlash=true
-    >
-    </AgGridVue>
+      <div class="wrapTable">
+        <div class="redactTable">
+          <div>
+            <button class="buttonsWithoutBorder">Сохранить изменения</button>
+          </div>
+          <div class="rightGroup">
+            <button class="buttonMenu">
+              <img src="./assets/svg/combined-shape.svg" alt="settingsIcon">
+            </button>
+          </div>
+        </div>
+
+        <AgGridVue class="ag-theme-quartz" style="width: 100%; 
+        height: 453px" :rowData="rowData" :columnDefs="listMenu[0].listColumns" :rowDragManaged=true
+          :onGridReady="onGridReady" :enableCellChangeFlash=true @visibleChanged="onRowDataUpdated">
+        </AgGridVue>
+      </div>
+    </section>
   </div>
-</section>
-</div>
 </template>
 
 <script>
-// import { createApp } from 'vue';
-import "ag-grid-community/styles/ag-grid.css"; 
+import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import { AgGridVue } from "ag-grid-vue3"; 
+import { AgGridVue } from "ag-grid-vue3";
 export default {
   name: 'App',
   data() {
     return {
-      listMenu:[{name:'Отображение столбцов ',showListColumns:false,
-      listColumns:[{col:"Наименование единицы",isShow:true},
-      {col:"Цена",isShow:true},
-      {col:"Количество",isShow:false},
-      {col:"Наименование товара",isShow:true},
-      {col:"Итого",isShow:true},]
+      listMenu: [{
+        name: 'Отображение столбцов ',
+        listColumns: []
       },
-      {name:"Порядок столбцов ",showListColumns:false,listColumns:[]}],
-      showList:false,
-      columnDefs: null,
-      rowData: null, 
-      options:["Мраморный щебень фр. 30 мм, 40кг",
-      "Мраморный щебень фр. 2-5 мм, 25кг",
-      "Мраморный щебень фр. 4-8 мм, 10кг",
-      "Мраморный щебень фр. 3-10 мм, 15кг"],
+      { name: "Порядок столбцов ", showListColumns: false, listColumns: [] }
+      ],
+      showList: false,
+      showListColumns: false,
+      // columnDefs: null,
+      rowData: null,
+      options: ["Мраморный щебень фр. 30 мм, 40кг",
+        "Мраморный щебень фр. 2-5 мм, 25кг",
+        "Мраморный щебень фр. 4-8 мм, 10кг",
+        "Мраморный щебень фр. 3-10 мм, 15кг"],
     }
   },
   components: {
     AgGridVue
   },
-  methods:{
-  addNewRow(){
-    this.rowData = [...this.rowData, {"index": "", " ":"","Наименование единицы": this.options[0],
-    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"}, ]
+  methods: {
+    addNewRow() {
+      this.rowData = [...this.rowData, {
+        index: "", " ": "", "Наименование единицы": this.options[0],
+        "Цена": 1231, "Кол-во": 12, "Название товара": "Мраморный щебень", "Итого": ""
+      },]
     },
-  onGridReady(params) {
+    onGridReady(params) {
       this.gridApi = params.api;
     },
-    showListMenu(){
-       this.showList=!this.showList
-      
+    showListMenu() {
+      this.showList = !this.showList
+
     },
-    showListNewColumns(item){
-  item.showListColumns=!item.showListColumns
+    showListNewColumns(item) {
+      item.showListColumns = !item.showListColumns
     },
-    handlerShowCol(col){
-console.log(col)
+    onRowDataUpdated(field) {
+      // const column = this.listMenu[0].listColumns.getColumn(field);
+      // console.log(column);
+
+      const columnDef = this.listMenu[0].listColumns.find((def) => def.field == field);
+      columnDef.hide = !columnDef.hide;
+      this.gridApi.setColumnDefs(this.listMenu[0].listColumns);
     },
-  //   updateIndexes(params) {
-  //     this.gridApi = params.api;
-  //  this.rowData.forEach((e,i)=>e.index=i)
-  //  this.gridApi.applyTransaction({ update: this.rowData });
-  //   },
-    getRowNodeId: function(data) {
-          return data.index.value; // замените на уникальный идентификатор строки, если он есть
-        },
+
+    //   updateIndexes(params) {
+    //     this.gridApi = params.api;
+    //  this.rowData.forEach((e,i)=>e.index=i)
+    //  this.gridApi.applyTransaction({ update: this.rowData });
+    //   },
+    // getRowNodeId: function (data) {
+    //   console.log(data.field);
+    //   data.index.value; // замените на уникальный идентификатор строки, если он есть
+    // },
   },
- computed:{
-  
+  computed: {
 
- },
-
+  },
   mounted() {
-    
-    this.columnDefs = [
-    { field: 'index',
-    headerName: '',
-    width:50,
-  editable: false,
-valueGetter:params=>params.node.rowIndex
-  },
-    { field: "id",
-      headerName: '',
-      rowDrag : true,
-      suppressDragLeaveHidesColumns: true,
-      rowDragManaged:true,
-      width:50,
-    },
-    { field: "Наименование единицы", editable: true,
-      filter: false,
-     sortable: false ,
-     cellEditor: 'agSelectCellEditor',
-     cellEditorParams: { values: [this.options[0],this.options[1],this.options[2],this.options[3]] },
-    },
-    { field: "Цена", editable: true,cellEditor: 'agTextCellEditor',},
-    { field: "Кол-во", editable: true,cellEditor: 'agTextCellEditor',},
-    { field: "Название товара",editable: true,cellEditor: 'agTextCellEditor', },
-    { field: "Итого",},
+
+    this.listMenu[0].listColumns = [
+      {
+        field: 'Индекс',
+        hide: false,
+        headerName: '',
+        width: 50,
+        editable: false,
+        valueGetter: params => params.node.rowIndex
+      },
+      {
+        field: "Перемещение",
+        hide: false,
+        headerName: '',
+        rowDrag: true,
+        suppressDragLeaveHidesColumns: true,
+        rowDragManaged: true,
+        width: 50,
+      },
+      {
+        field: "Наименование единицы", editable: true,
+        filter: false,
+        sortable: false,
+        cellEditor: 'agSelectCellEditor',
+        width: 450,
+        hide: false,
+        cellEditorParams: { values: [this.options[0], this.options[1], this.options[2], this.options[3]] },
+      },
+      { field: "Цена", editable: true, cellEditor: 'agTextCellEditor', hide: false, },
+      { field: "Кол-во", editable: true, cellEditor: 'agTextCellEditor', hide: false, },
+      { field: "Название товара", editable: true, cellEditor: 'agTextCellEditor', width: 350, hide: false, },
+      {
+        field: "Итого",
+        width: 145,
+        hide: false,
+        valueGetter: (params) => params.data["Итого"] = params.data["Цена"] * params.data["Кол-во"]
+      },
     ]
     this.rowData = [
-    {index: "", " ":"","Наименование единицы": this.options[0],
-    "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
-  },
-    {index: "" , " ": "", "Наименование единицы":this.options[1],
-    "Цена" : "1500", "Кол-во":"10","Название товара":"Мраморный щебень","Итого":"1231"
-  },
-    {index: "" , " ":"", "Наименование единицы": this.options[2],
-    "Цена" : "1000", "Кол-во":"5","Название товара":"Мраморный щебень","Итого":"1231"
-  },
-    {index: "" , " ": "", "Наименование единицы": this.options[3],
-    "Цена" : "860", "Кол-во":"10","Название товара":"Мраморный щебень","Итого":"1231"
-  },
+      {
+        id: 1, index: "", " ": "", "Наименование единицы": this.options[0],
+        "Цена": 1231, "Кол-во": 12, "Название товара": "Мраморный щебень", "Итого": ""
+      },
+      {
+        id: 2, index: "", " ": "", "Наименование единицы": this.options[1],
+        "Цена": 1500, "Кол-во": 10, "Название товара": "Мраморный щебень", "Итого": ""
+      },
+      {
+        id: 3, index: "", " ": "", "Наименование единицы": this.options[2],
+        "Цена": 1000, "Кол-во": 5, "Название товара": "Мраморный щебень", "Итого": ""
+      },
+      {
+        id: 4, index: "", " ": "", "Наименование единицы": this.options[3],
+        "Цена": 860, "Кол-во": 10, "Название товара": "Мраморный щебень", "Итого": ""
+      },
     ]
   },
-
-
 }
+// setup()  {
+//           const rowData = ref([
+//   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+//   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+// },
+//   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+//   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+// },
+//   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+//   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+// },
+//   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
+//   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
+// },
+// ])
 
-  
-
-
-  // setup()  {
-  //           const rowData = ref([
-  //   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
-  //   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
-  // },
-  //   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
-  //   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
-  // },
-  //   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
-  //   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
-  // },
-  //   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг",
-  //   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231"
-  // },
-    
-    
-  // ])
-
-  // Column Definitions: Defines & controls grid columns.
+// Column Definitions: Defines & controls grid columns.
 //   const colDefs = ref([
 //     { field: "staticArray",
 //       headerName: '1',
@@ -205,7 +214,7 @@ valueGetter:params=>params.node.rowIndex
 // const defaultColDef = ref({
 //       editable: true,
 //       filter: false,
-//      sortable: false 
+//      sortable: false
 //     });
 //   return {
 //     rowData,
@@ -218,9 +227,10 @@ valueGetter:params=>params.node.rowIndex
 
 <style lang="scss">
 * {
-	margin: 0;
-	padding: 0;
+  margin: 0;
+  padding: 0;
 }
+
 @font-face {
   font-family: "MyriadPro";
   font-style: normal;
@@ -228,25 +238,30 @@ valueGetter:params=>params.node.rowIndex
   unicode-range: U+000-5FF;
   src: local("myriadpro"), url("../public/fonts/myriadpro/MYRIADPRO-SEMIBOLD.OTF"), format("OTF");
 }
+
 #app {
   font-family: 'MyriadPro';
   max-width: 1728px;
 }
-.wrap{
+
+.wrap {
   display: flex;
   background-color: #fbfcfd;
   width: 1728px;
 }
-.wrapSection{
+
+.wrapSection {
   margin: 25px;
-  width:100%;
+  width: 100%;
 }
-.leftAside{
+
+.leftAside {
   background-color: #000000;
   min-width: 229px;
   height: 100vh;
 }
-.title{
+
+.title {
   margin-bottom: 25px;
   font-size: 30px;
   font-weight: normal;
@@ -256,7 +271,8 @@ valueGetter:params=>params.node.rowIndex
   letter-spacing: normal;
   color: #000;
 }
-.links{
+
+.links {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -265,25 +281,29 @@ valueGetter:params=>params.node.rowIndex
   margin-left: 25px;
   margin-bottom: 25px;
   text-transform: none;
-  a{
+
+  a {
     text-decoration: none;
-    color:#1253a2 ;
+    color: #1253a2;
     font-family: 'MyriadPro';
     font-size: 16px;
-  font-weight: 600;
+    font-weight: 600;
   }
-  .secondLink{
+
+  .secondLink {
     margin-left: 20px;
     margin-right: 25px;
     text-transform: none;
   }
 }
-.rightGroup{
+
+.rightGroup {
   position: relative;
-  max-height:15px ;
+  max-height: 15px;
   align-self: center;
   margin-right: 15px;
-  button{
+
+  button {
     display: flex;
     justify-content: space-between;
     gap: 5px;
@@ -292,40 +312,44 @@ valueGetter:params=>params.node.rowIndex
     height: 15px;
   }
 }
-.listOptions{
+
+.listOptions {
   position: absolute;
   top: 20px;
   right: 0px;
   width: max-content;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    border: 1px solid black;
-    border-radius: 5px;
-    background-color: #fff;  
-  .wrapButtonColumnMenu{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  border: 1px solid black;
+  border-radius: 5px;
+  background-color: #fff;
+
+  .wrapButtonColumnMenu {
     position: relative;
-    .listColumn{
+
+    .listColumn {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-position: absolute;
-top: 30px;
-right: 0;
-width: max-content;
-background-color:#fff; 
-border: 1px solid black;
-z-index: 2;
-padding:7px ;
-gap:5px;
-border-radius: 5px;
-label{
-  pointer-events: none;
-}
+      position: absolute;
+      top: 30px;
+      right: 0;
+      min-width: max-content;
+      background-color: #fff;
+      border: 1px solid black;
+      z-index: 2;
+      padding: 7px;
+      gap: 5px;
+      border-radius: 5px;
+
+      label {
+        pointer-events: none;
+      }
     }
-  }  
-  
-  .buttonColumnMenu{
+  }
+
+  .buttonColumnMenu {
     position: relative;
     width: 100%;
     height: fit-content;
@@ -336,10 +360,12 @@ label{
     // .{}
   }
 }
+
 .buttonColumnMenu:hover {
-    background-color: #eef3f8;
-  }
-.newRow{
+  background-color: #eef3f8;
+}
+
+.newRow {
   max-width: 1449px;
   padding: 20px 0 20px 25px;
   border-radius: 10px;
@@ -348,37 +374,40 @@ label{
   background-color: #fff;
   text-align: left;
 }
-.adderRow{
-color: #ffffff;
-padding: 10px 15px 10px;
-border-radius: 5px;
-background-color:#2f8cff ;
-border: none;
-font-family: 'MyriadPro';
-font-size: 14px;
+
+.adderRow {
+  color: #ffffff;
+  padding: 10px 15px 10px;
+  border-radius: 5px;
+  background-color: #2f8cff;
+  border: none;
+  font-family: 'MyriadPro';
+  font-size: 14px;
 }
-.plus{
+
+.plus {
   color: #1253a2;
-  padding-right: 7px ;
-height: 11px;
+  padding-right: 7px;
+  height: 11px;
 }
-.wrapTable{
+
+.wrapTable {
   margin-top: 25px;
   background-color: #fff;
   width: 100%;
 }
-.redactTable{
+
+.redactTable {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   margin: 10px 0 15px;
   gap: 20px;
 }
-.buttonsWithoutBorder{
+
+.buttonsWithoutBorder {
   border: none;
   color: #a6b7d4;
   background-color: unset;
 }
-
-
 </style>
