@@ -1,64 +1,119 @@
 <template> 
-<div class="wrap"> 
-  <aside class="leftAside"></aside> 
-  <section class="wrapSection"> 
-    <h1 class="title">Проведение ТО и мелкий ремонт</h1> 
-    <div class="links"> 
-      <div class="leftGroup"> 
-        <a href="#">Общее</a> 
-        <a class="secondLink" href="#">Товары</a> 
-        <a href="#">Доп. расходы</a> 
-      </div> 
-      <div class="rightGroup"> 
-        <button @click="showListMenu" class="buttonMenu"><img src="./assets/svg/combined-shape.svg" 
-            alt="settingsIcon"></button> 
-        <div v-show="showList" class="listOptions"> 
-          <button class="buttonColumnMenu" v-for="item, index in listMenu" :key="index"> 
-            <div class="wrapButtonColumnMenu"> 
-              <button @click="showListNewColumns(item)" class="buttonColumnMenu"> 
-                {{ item.name }} 
-                <div v-if="!item.showListColumns">&gt;</div> 
-                <div v-else> &lt;</div> 
+  <div class="mainWrapper">
+    <div class="wrap"> 
+      <aside class="leftAside"></aside> 
+      <section class="wrapSection"> 
+        <div class="burger">
+          <button>
+            <img src="./assets/svg/burger.svg" alt="burgerImg">
+          </button>
+          <h1 class="title">Проведение ТО и мелкий ремонт</h1>
+        </div>
+        <div class="links"> 
+          <div class="leftGroup"> 
+            <a href="#">Общее</a> 
+            <a class="secondLink" href="#">Товары</a> 
+            <a href="#">Доп. расходы</a> 
+          </div> 
+          <div class="rightGroup"> 
+            <button class="buttonMenu"> 
+                <img src="./assets/svg/combined-shape.svg" alt="settingsIcon"> 
               </button> 
-              <div v-if="item.showListColumns" class="listColumn"> 
-                <div v-for="column in item.listColumns" :key="column.field"> 
-                  <input type="checkbox" id="idx" @change="onRowDataUpdated(column.field)" checked="true" /> 
-                  &nbsp; 
-                  <label for=" idx">{{ column.field }}</label> 
-                </div> 
+          </div> 
+        </div> 
+        <div class="newRow"> 
+          <button class="adderRow" @click="addNewRow"><span class="plus">+</span> Добавить строку</button> 
+        </div> 
+        <div class="wrapTable"> 
+          <div class="redactTable"> 
+            <div> 
+              <button class="buttonsWithoutBorder" @click="sendDataToServer" >Сохранить изменения</button> 
+            </div> 
+            <div class="rightGroup"> 
+              <button @click="showListMenu" class="buttonMenu"><img src="./assets/svg/combined-shape.svg" 
+                alt="settingsIcon">
+              </button> 
+              <div v-show="showList" class="listOptions"> 
+                <button class="buttonColumnMenu" v-for="item, index in listMenu" :key="index"> 
+                  <div class="wrapButtonColumnMenu"> 
+                    <button @click="showListNewColumns(item)" class="buttonColumnMenu"> 
+                      {{ item.name }} 
+                      <div v-if="!item.showListColumns">&gt;</div> 
+                      <div v-else> &lt;</div> 
+                    </button> 
+                    <div v-if="item.showListColumns" class="listColumn"> 
+                      <div v-for="column in item.listColumns" :key="column.field"> 
+                        <input type="checkbox" id="idx" 
+                        @change="onRowDataUpdated(column.field)" 
+                        checked="true" /> 
+                        &nbsp; 
+                        <label for=" idx">{{ column.field }}</label> 
+                      </div> 
+                    </div> 
+                  </div> 
+                </button> 
               </div> 
             </div> 
-          </button> 
+          </div> 
+          <AgGridVue  class="ag-theme-quartz" style="min-width: max-content;" 
+            :rowData="rowData" 
+            :columnDefs="listMenu[0].listColumns" 
+            :rowDragManaged=true 
+            :onGridReady="onGridReady" 
+            :enableCellChangeFlash=true 
+            @visibleChanged="onRowDataUpdated" 
+            @RowDragEnd="onRowDragEnd" > 
+          </AgGridVue> 
+          <div class="wrapResult">
+            <div class="wrapResult_right">
+              <div class="preResult">
+                <div class="rowForSumm">
+                  <div>
+                    Сумма:
+                  </div>
+                  <div>
+                    {{ summCosts }}
+                  </div>
+                </div>
+                <div class="rowForSumm">
+                  <div>
+                    Кол-во:
+                  </div>
+                  <div>
+                    {{ summPoints }}
+                  </div>
+                </div>
+                <div class="rowForSumm">
+                  <div>
+                    Общий вес:
+                  </div>
+                  <div>
+                    {{ summWeights }}
+                  </div>
+                </div>
+              </div>
+              <div class="preResult">
+                <div class="rowForSumm summ">
+                    <div>
+                      Общая сумма:
+                    </div>
+                    <div>
+                    {{ summCosts }}
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
         </div> 
-      </div> 
+      </section> 
     </div> 
-    <div class="newRow"> 
-      <button class="adderRow" @click="addNewRow"><span class="plus">+</span> Добавить строку</button> 
-    </div> 
-    <div class="wrapTable"> 
-      <div class="redactTable"> 
-        <div> 
-          <button class="buttonsWithoutBorder">Сохранить изменения</button> 
-        </div> 
-        <div class="rightGroup"> 
-          <button class="buttonMenu"> 
-            <img src="./assets/svg/combined-shape.svg" alt="settingsIcon"> 
-          </button> 
-        </div> 
-      </div> 
-
-      <AgGridVue class="ag-theme-quartz" style="width: 100%;  
-      height: 453px" :rowData="rowData" :columnDefs="listMenu[0].listColumns" :rowDragManaged=true 
-        :onGridReady="onGridReady" :enableCellChangeFlash=true @visibleChanged="onRowDataUpdated" @RowDragEnd="onRowDragEnd"> 
-      </AgGridVue> 
-    </div> 
-  </section> 
-</div> 
+  </div>
 </template> 
 
 <script> 
 import "ag-grid-community/styles/ag-grid.css"; 
 import "ag-grid-community/styles/ag-theme-quartz.css"; 
+import axios from 'axios';
 import { AgGridVue } from "ag-grid-vue3"; 
 export default { 
 name: 'App', 
@@ -72,7 +127,6 @@ data() {
     ], 
     showList: false, 
     showListColumns: false, 
-    // columnDefs: null, 
     rowData: null, 
     options: ["Мраморный щебень фр. 30 мм, 40кг", 
       "Мраморный щебень фр. 2-5 мм, 25кг", 
@@ -85,49 +139,63 @@ components: {
 }, 
 methods: { 
   addNewRow() { 
-    this.rowData = [...this.rowData, { 
-      index: "", " ": "", "Наименование единицы": this.options[0], 
-      "Цена": 1231, "Кол-во": 12, "Название товара": "Мраморный щебень", "Итого": "" 
-    },] 
+    this.rowData.push({id:this.rowData.length+1,index: "", " ": "", "Наименование единицы": this.options[0], 
+      "Цена": 1231, "Кол-во": 12, "Название товара": "Мраморный щебень", "Итого": ""})
+      this.rowData=[...this.rowData]
   }, 
   onGridReady(params) { 
     this.gridApi = params.api; 
   }, 
   showListMenu() { 
     this.showList = !this.showList 
-
   }, 
   showListNewColumns(item) { 
     item.showListColumns = !item.showListColumns 
   }, 
   onRowDataUpdated(field) { 
-    // const column = this.listMenu[0].listColumns.getColumn(field); 
-    // console.log(column); 
-
     const columnDef = this.listMenu[0].listColumns.find((def) => def.field == field); 
     columnDef.hide = !columnDef.hide; 
     this.gridApi.setColumnDefs(this.listMenu[0].listColumns); 
   }, 
   onRowDragEnd(){
     const columnDef = this.listMenu[0].listColumns.map((e,i)=>e.index=i)
-    this.gridApi.setColumnDefs([...this.listMenu[0].listColumns,columnDef]);
-    
-  }
-  //   updateIndexes(params) { 
-  //     this.gridApi = params.api; 
-  //  this.rowData.forEach((e,i)=>e.index=i) 
-  //  this.gridApi.applyTransaction({ update: this.rowData }); 
-  //   }, 
-  // getRowNodeId: function (data) { 
-  //   console.log(data.field); 
-  //   data.index.value; // замените на уникальный идентификатор строки, если он есть 
-  // }, 
+    this.gridApi.setColumnDefs([...this.listMenu[0].listColumns,columnDef]); 
+  },
+  sendDataToServer() {
+      const data = { key: 'value' }
+
+      axios.post('.....', data)
+        .then(response => {
+          console.log(response.data)
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    }
 }, 
 computed: { 
-
+  summCosts(){
+    if(this.rowData){
+      return this.rowData.reduce((sum,el)=>sum+el["Кол-во"]*el["Цена"],0)
+    }
+  return 0
+  },
+  summPoints(){
+    if(this.rowData){
+      return this.rowData.reduce((sum,el)=>sum+el["Кол-во"],0)
+    }
+  return 0
+  },
+  summWeights(){
+    if(this.rowData){
+      return this.rowData.reduce((sum,el)=>
+      sum+(+el["Наименование единицы"].match(/\d+кг/i)[0].match(/\d+/i))*
+      el["Кол-во"],0)
+    }
+  return 0
+  },
 }, 
 mounted() { 
-
   this.listMenu[0].listColumns = [ 
     { 
       field: 'Индекс', 
@@ -142,25 +210,52 @@ mounted() {
       hide: false, 
       headerName: '', 
       rowDrag: true, 
-      suppressDragLeaveHidesColumns: true, 
-      rowDragManaged: true, 
-      width: 50, 
+      width:50
+      
     }, 
     { 
-      field: "Наименование единицы", editable: true, 
+      field: "Наименование единицы",
+      editable: true, 
       filter: false, 
       sortable: false, 
       cellEditor: 'agSelectCellEditor', 
-      width: 450, 
-      hide: false, 
-      cellEditorParams: { values: [this.options[0], this.options[1], this.options[2], this.options[3]] }, 
+      flex:2.1, 
+      hide: false,
+      singleClickEdit:true,
+      onCellValueChanged:(params)=>{
+        switch (params.data["Наименование единицы"]) {
+          case this.options[0]:
+          this.rowData[params.node.rowIndex]["Цена"]=1231
+          break
+          case this.options[1]:
+          this.rowData[params.node.rowIndex]["Цена"]=1500
+          break
+          case this.options[2]:
+          this.rowData[params.node.rowIndex]["Цена"]=1000
+          break
+          case this.options[3]:
+          this.rowData[params.node.rowIndex]["Цена"]=860
+          break
+        }
+        return this.rowData=[...this.rowData]
+      },
+      valueGetter:params=>params.data["Наименование единицы"],
+      cellEditorParams: { values: 
+        [this.options[0], this.options[1], this.options[2], this.options[3]]
+       }, 
     }, 
-    { field: "Цена", editable: true, cellEditor: 'agTextCellEditor', hide: false, }, 
-    { field: "Кол-во", editable: true, cellEditor: 'agTextCellEditor', hide: false, }, 
-    { field: "Название товара", editable: true, cellEditor: 'agTextCellEditor', width: 350, hide: false, }, 
-    { 
-      field: "Итого", 
-      width: 145, 
+    { field: "Цена", editable: true, cellEditor: 'agTextCellEditor',
+    singleClickEdit:true, hide: false, flex:1 }, 
+    { field: "Кол-во", editable: true, cellEditor: 'agTextCellEditor', 
+    singleClickEdit:true, hide: false,flex:1 }, 
+    { field: "Название товара", 
+      editable: true, 
+      cellEditor: 'agTextCellEditor', 
+      flex:1.6, 
+      hide: false, 
+    }, 
+    {field: "Итого", 
+       flex:1, 
       hide: false, 
       valueGetter: (params) => params.data["Итого"] = params.data["Цена"] * params.data["Кол-во"] 
     }, 
@@ -185,48 +280,6 @@ mounted() {
   ] 
 }, 
 } 
-// setup()  { 
-//           const rowData = ref([ 
-//   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг", 
-//   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231" 
-// }, 
-//   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг", 
-//   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231" 
-// }, 
-//   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг", 
-//   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231" 
-// }, 
-//   {"": " " , " ": " ", "Наименование единицы": "Мраморный щебень фр. 2-5 мм, 25кг", 
-//   "Цена" : "1231", "Кол-во":"12","Название товара":"Мраморный щебень","Итого":"1231" 
-// }, 
-// ]) 
-
-// Column Definitions: Defines & controls grid columns. 
-//   const colDefs = ref([ 
-//     { field: "staticArray", 
-//       headerName: '1', 
-//       cellClass: ['my-class1','my-class2'] 
-//     }, 
-//     { field: "" }, 
-//     { field: "Наименование единицы",editable:true,rowSelection:"multiple", 
-//       }, 
-//     { field: "Цена" }, 
-//     { field: "Кол-во" }, 
-//     { field: "Название товара" }, 
-//     { field: "Итого" }, 
-//   ]) 
-// const defaultColDef = ref({ 
-//       editable: true, 
-//       filter: false, 
-//      sortable: false 
-//     }); 
-//   return { 
-//     rowData, 
-//     colDefs, 
-//     defaultColDef 
-//   } 
-//   }, 
-// } 
 </script> 
 
 <style lang="scss"> 
@@ -247,11 +300,18 @@ src: local("myriadpro"), url("../public/fonts/myriadpro/MYRIADPRO-SEMIBOLD.OTF")
 font-family: 'MyriadPro'; 
 max-width: 1728px; 
 } 
-
+.mainWrapper{
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 100vh;
+}
 .wrap { 
 display: flex; 
 background-color: #fbfcfd; 
-width: 1728px; 
+max-width: 1728px; 
+flex-grow: 1;
+height: fit-content;
 } 
 
 .wrapSection { 
@@ -262,11 +322,23 @@ width: 100%;
 .leftAside { 
 background-color: #000000; 
 min-width: 229px; 
-height: 100vh; 
+flex-grow: 1;
 } 
+.burger{
+  button{
+    display: none;
+    img{
+      padding: 12px 0 0 10px;
+    }
+    
+  }
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 25px;
+  gap: 25px;
 
+}
 .title { 
-margin-bottom: 25px; 
 font-size: 30px; 
 font-weight: normal; 
 font-stretch: normal; 
@@ -328,6 +400,7 @@ align-items: flex-end;
 border: 1px solid black; 
 border-radius: 5px; 
 background-color: #fff; 
+z-index: 1;
 
 .wrapButtonColumnMenu { 
   position: relative; 
@@ -399,6 +472,9 @@ height: 11px;
 margin-top: 25px; 
 background-color: #fff; 
 width: 100%; 
+border-radius: 10px;
+  box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.07);
+  border: solid 1px #fff;
 } 
 
 .redactTable { 
@@ -414,4 +490,92 @@ border: none;
 color: #a6b7d4; 
 background-color: unset; 
 } 
+.wrapResult{
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 25px;
+  
+}
+.wrapResult_right{
+  min-width: 304px;
+min-height: 10px;
+display: flex;
+flex-direction: column;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: normal;
+  letter-spacing: normal;
+  color: #8f8f8f;
+  gap:5px;
+  margin-right: 15px;
+    .preResult{
+  min-width:304px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  border: solid 1px #eeeff1;
+  background-color: #fbfcfd;
+   padding: 15px;
+   gap:15px;
+}
+}
+
+.rowForSumm{
+  display: flex;
+  justify-content: space-between;
+ 
+}
+.summ{
+  color: #000;
+}
+
+.ag-root-wrapper-body.ag-layout-normal {
+  height: 100%;
+}
+.ag-cell-value{
+text-overflow: clip;
+}
+@media screen and (max-width: 800px){
+  .leftAside{
+    display: none;
+  }
+}
+  @media screen and (max-width: 650px){
+
+    .wrap{
+      margin: 16px 10px 0;
+    }
+    .wrapSection{
+      margin: 0;
+    }
+    .burger{
+      button{
+        display: contents;
+      }
+      .title{
+      font-size: 30px;
+    }
+    }
+    
+    .links{
+      margin-left: 0;
+    }
+    .rightGroup,.redactTable{
+      display: none;
+    }
+    
+
+
+    .wrapResult{
+      margin-top: 25px;
+      .preResult{
+        font-size: 16px;
+      }
+      
+    }
+  }
 </style> 
