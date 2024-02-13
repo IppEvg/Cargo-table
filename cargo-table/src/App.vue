@@ -58,27 +58,27 @@
             :enableCellChangeFlash=true @visibleChanged="onRowDataUpdated" @RowDragEnd="onRowDragEnd">
           </AgGridVue>
           <div class="mobileBlock">
-            <div v-for="(item, idx) in this.rowData" :key="item.id" class="mobileBlockItem"
+            <div v-for="(item, idx) in this.rowData" :key="item.id" class="mobileBlockItem "
               @dragstart="onDragStart($event, item.id)" draggable="true" @drop="onDrop($event, item.id)"
-              @dragenter="onDragEnter($event)" @dragover.prevent ref="rows">
-              <div class="mobileBlockNumber">
-                <h6>Номер строки</h6>
-                <button class="burgerButton">
-                  <img src="./assets/svg/burger.svg" alt="burgerImg">
+              @dragenter="onDragEnter($event,item.id)" @dragleave="onDragLeave($event)"  @dragover.prevent ref="rows">
+              <div class="mobileBlockNumber ">
+                <h6 class="">Номер строки</h6>
+                <button class="burgerButton ">
+                  <img src="./assets/svg/burger.svg" alt="burgerImg" >
                 </button>
                 {{ idx + 1 }}
               </div>
-              <div class="mobileBlockDoing mobileBlockNumber" @click="handlerWindowDoing(item)">
-                <h6>Действие</h6>
-                <button class="burgerButton burgerButton_colorBlue">
-                  <img src="./assets/svg/Combined Shape2.svg" alt="burgerImg">
+              <div class="mobileBlockDoing mobileBlockNumber " @click="handlerWindowDoing(item)">
+                <h6 >Действие</h6>
+                <button class="burgerButton burgerButton_colorBlue ">
+                  <img src="./assets/svg/Combined Shape2.svg" alt="burgerImg" >
                 </button>
-                <div v-show="item.doing" class="windowDoing">
-                  <button @click="delRow(item.id)">Удалить</button>
+                <div v-show="item.doing" class="windowDoing ">
+                  <button @click="delRow(item.id)" >Удалить</button>
                 </div>
               </div>
-              <div class="mobileBlockRow">
-                <h6>Наименование единицы</h6>
+              <div class="mobileBlockRow ">
+                <h6 >Наименование единицы</h6>
                 <select v-model="item['Наименование единицы']" class="mobileBlockRow_select">
                   <option v-for="option, index in this.options" :key="index"
                     :selected="option === item['Наименование единицы'] ? true : false">
@@ -86,21 +86,21 @@
                   </option>
                 </select>
               </div>
-              <div class="mobileBlockRow">
-                <h6>Цена</h6>
+              <div class="mobileBlockRow ">
+                <h6 >Цена</h6>
                 <input type="number" v-model="item['Цена']" class="mobileBlockRow_select" />
               </div>
               <div class="mobileBlockRow">
-                <h6>Кол-во</h6>
-                <input type="number" v-model="item['Кол-во']" class="mobileBlockRow_select" />
+                <h6 >Кол-во</h6>
+                <input type="number" v-model="item['Кол-во']" class="mobileBlockRow_select " />
               </div>
-              <div class="mobileBlockRow">
-                <h6>Наименование товара</h6>
-                <input type="text" :value="item['Название товара']" readonly class="mobileBlockRow_select" />
+              <div class="mobileBlockRow ">
+                <h6 >Наименование товара</h6>
+                <input type="text" :value="item['Название товара']" readonly class=" mobileBlockRow_select" />
               </div>
-              <div class="mobileBlockRow">
-                <h6>Итого</h6>
-                <input type="number" :value="getSummCost(item)" readonly class="mobileBlockRow_select" />
+              <div class="mobileBlockRow ">
+                <h6 >Итого</h6>
+                <input type="number" :value="getSummCost(item)" readonly class=" mobileBlockRow_select" />
               </div>
             </div>
 
@@ -229,16 +229,27 @@ export default {
       return this.rowData = [...this.rowData]
     },
     onDragEnter(e) {
-
-      this.$refs.rows.forEach(e => e.classList.remove("active"))
-      console.log(e.target);
+      e.preventDefault()
       if (e.target.classList.value === "mobileBlockItem") {
         e.target.classList.add("active")
       }
-      return e.preventDefault()
+      let children = e.target.children;
+      for (var i = 0; i < children.length; i++) {
+          return
+        }
+    },
+    onDragLeave(e){
+      // e.preventDefault()
+      console.log(e.target );
+      if (e.target.classList.value === "mobileBlockItem") {
+        e.target.classList.remove("active")
+      }
+      let children = e.target.children;
+      for (var i = 0; i < children.length; i++) {
+          return
+        }
     },
     onDrop(e, id) {
-      console.log(e.target);
       this.$refs.rows.forEach(e => {
         if (e.classList == "mobileBlockItem active") {
           e.classList.remove("active")
@@ -703,7 +714,6 @@ export default {
      flex-direction: column;
      width: 100%;
      box-sizing: border-box;
-
      h6 {
        font-size: 10px;
        color: #8f8f8f;
