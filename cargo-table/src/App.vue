@@ -58,8 +58,10 @@
             :enableCellChangeFlash=true @visibleChanged="onRowDataUpdated" @RowDragEnd="onRowDragEnd">
           </AgGridVue>
           <div class="mobileBlock">
-            <div v-for="(item, idx) in this.rowData" :key="item.id" class="mobileBlockItem">
-              <div class="mobileBlockNumber" @mousedown="capture" @mouseup="noCapture">
+            <div v-for="(item, idx) in this.rowData" :key="item.id" class="mobileBlockItem"
+              @dragstart="onDragStart($event, item.id)" draggable="true" @drop="onDrop($event, item.id)"
+              @dragenter="onDragEnter($event)" @dragover.prevent ref="rows">
+              <div class="mobileBlockNumber">
                 <h6>Номер строки</h6>
                 <button class="burgerButton">
                   <img src="./assets/svg/burger.svg" alt="burgerImg">
@@ -226,11 +228,30 @@ export default {
       this.rowData.splice(index, 1)
       return this.rowData = [...this.rowData]
     },
-    capture(e) {
-      console.log(e);
+    onDragEnter(e) {
+
+      this.$refs.rows.forEach(e => e.classList.remove("active"))
+      console.log(e.target);
+      if (e.target.classList.value === "mobileBlockItem") {
+        e.target.classList.add("active")
+      }
+      return e.preventDefault()
     },
-    noCapture(e) {
-      console.log(e);
+    onDrop(e, id) {
+      console.log(e.target);
+      this.$refs.rows.forEach(e => {
+        if (e.classList == "mobileBlockItem active") {
+          e.classList.remove("active")
+        }
+      })
+      const itemFirstIdx = this.rowData.findIndex(el => el.id == e.dataTransfer.getData("itemId"))
+      const itemSecondIdx = this.rowData.findIndex(el => el.id === id);
+      [this.rowData[itemFirstIdx], this.rowData[itemSecondIdx]] = [this.rowData[itemSecondIdx], this.rowData[itemFirstIdx]]
+    },
+    onDragStart(e, id) {
+      e.dataTransfer.drpEffect = "move"
+      e.dataTransfer.effectAllowed = "move"
+      e.dataTransfer.setData('itemId', id)
     }
   },
   computed: {
@@ -740,6 +761,11 @@ export default {
      .preResult {
        font-size: 16px;
      }
+   }
+
+   .active {
+
+     border-top: 3px dotted #000000;
    }
 
 
