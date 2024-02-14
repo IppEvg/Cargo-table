@@ -2,7 +2,7 @@
   <div class="mainWrapper">
     <div class="wrap">
       <aside class="leftAside"></aside>
-      <section class="wrapSection">
+      <section class="wrap_section">
         <div class="burger">
           <button>
             <img src="./assets/svg/burger.svg" alt="burgerImg">
@@ -10,12 +10,12 @@
           <h1 class="title">Проведение ТО и мелкий ремонт</h1>
         </div>
         <div class="links">
-          <div class="leftGroup">
+          <div class="links_leftGroup">
             <a href="#">Общее</a>
-            <a class="secondLink" href="#">Товары</a>
+            <a class="links_leftGroup__secondLink" href="#">Товары</a>
             <a href="#">Доп. расходы</a>
           </div>
-          <div class="rightGroup">
+          <div class="links_rightGroup">
             <button class="buttonMenu">
               <img src="./assets/svg/combined-shape.svg" alt="settingsIcon">
             </button>
@@ -29,7 +29,7 @@
             <div>
               <button class="buttonsWithoutBorder" @click="sendDataToServer">Сохранить изменения</button>
             </div>
-            <div class="rightGroup">
+            <div class="links_rightGroup">
               <button @click="showListMenu" class="buttonMenu"><img src="./assets/svg/combined-shape.svg"
                   alt="settingsIcon">
               </button>
@@ -58,48 +58,48 @@
             :enableCellChangeFlash=true @visibleChanged="onRowDataUpdated" @RowDragEnd="onRowDragEnd">
           </AgGridVue>
           <div class="mobileBlock">
-            <div v-for="(item, idx) in this.rowData" :key="item.id" class="mobileBlockItem "
+            <div v-for="(item, idx) in rowData" :key="item.id" class="mobileBlockItem "
               @dragstart="onDragStart($event, item.id)" draggable="true" @drop="onDrop($event, item.id)"
-              @dragenter="onDragEnter($event,item.id)" @dragleave="onDragLeave($event)"  @dragover.prevent ref="rows">
+              @dragenter="onDragEnter($event, item.id)" @dragover.prevent ref="rows">
               <div class="mobileBlockNumber ">
                 <h6 class="">Номер строки</h6>
                 <button class="burgerButton ">
-                  <img src="./assets/svg/burger.svg" alt="burgerImg" >
+                  <img src="./assets/svg/burger.svg" alt="burgerImg">
                 </button>
                 {{ idx + 1 }}
               </div>
               <div class="mobileBlockDoing mobileBlockNumber " @click="handlerWindowDoing(item)">
-                <h6 >Действие</h6>
+                <h6>Действие</h6>
                 <button class="burgerButton burgerButton_colorBlue ">
-                  <img src="./assets/svg/Combined Shape2.svg" alt="burgerImg" >
+                  <img src="./assets/svg/Combined Shape2.svg" alt="burgerImg">
                 </button>
                 <div v-show="item.doing" class="windowDoing ">
-                  <button @click="delRow(item.id)" >Удалить</button>
+                  <button @click="delRow(item.id)">Удалить</button>
                 </div>
               </div>
               <div class="mobileBlockRow ">
-                <h6 >Наименование единицы</h6>
+                <h6>Наименование единицы</h6>
                 <select v-model="item['Наименование единицы']" class="mobileBlockRow_select">
-                  <option v-for="option, index in this.options" :key="index"
+                  <option v-for="option, index in options" :key="index"
                     :selected="option === item['Наименование единицы'] ? true : false">
                     {{ option }}
                   </option>
                 </select>
               </div>
               <div class="mobileBlockRow ">
-                <h6 >Цена</h6>
+                <h6>Цена</h6>
                 <input type="number" v-model="item['Цена']" class="mobileBlockRow_select" />
               </div>
               <div class="mobileBlockRow">
-                <h6 >Кол-во</h6>
+                <h6>Кол-во</h6>
                 <input type="number" v-model="item['Кол-во']" class="mobileBlockRow_select " />
               </div>
               <div class="mobileBlockRow ">
-                <h6 >Наименование товара</h6>
+                <h6>Наименование товара</h6>
                 <input type="text" :value="item['Название товара']" readonly class=" mobileBlockRow_select" />
               </div>
               <div class="mobileBlockRow ">
-                <h6 >Итого</h6>
+                <h6>Итого</h6>
                 <input type="number" :value="getSummCost(item)" readonly class=" mobileBlockRow_select" />
               </div>
             </div>
@@ -149,8 +149,8 @@
       </section>
     </div>
   </div>
-</template> 
-
+</template>  
+ 
 <script>
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -224,30 +224,23 @@ export default {
     },
     delRow(id) {
       const index = this.rowData.findIndex(e => e.id === id)
-      console.log(index);
       this.rowData.splice(index, 1)
       return this.rowData = [...this.rowData]
     },
     onDragEnter(e) {
       e.preventDefault()
       if (e.target.classList.value === "mobileBlockItem") {
+        this.$refs.rows.forEach(e => {
+          if (e.classList == "mobileBlockItem active") {
+            e.classList.remove("active")
+          }
+        })
         e.target.classList.add("active")
       }
       let children = e.target.children;
       for (var i = 0; i < children.length; i++) {
-          return
-        }
-    },
-    onDragLeave(e){
-      // e.preventDefault()
-      console.log(e.target );
-      if (e.target.classList.value === "mobileBlockItem") {
-        e.target.classList.remove("active")
+        return
       }
-      let children = e.target.children;
-      for (var i = 0; i < children.length; i++) {
-          return
-        }
     },
     onDrop(e, id) {
       this.$refs.rows.forEach(e => {
@@ -299,7 +292,7 @@ export default {
         headerName: '',
         width: 50,
         editable: false,
-        valueGetter: params => params.node.rowIndex,
+        valueGetter: params => params.node.rowIndex + 1,
       },
       {
         field: "Перемещение",
@@ -382,402 +375,9 @@ export default {
       },
     ]
   },
-} 
-</script> 
-
-<style lang="scss"> * {
-   margin: 0;
-   padding: 0;
- }
-
- @font-face {
-   font-family: "MyriadPro";
-   font-style: normal;
-   font-display: auto;
-   unicode-range: U+000-5FF;
-   src: local("myriadpro"), url("../public/fonts/myriadpro/MYRIADPRO-SEMIBOLD.OTF"), format("OTF");
- }
-
- #app {
-   font-family: 'MyriadPro';
-   max-width: 1728px;
- }
-
- .mainWrapper {
-   display: flex;
-   flex-direction: column;
-   height: 100%;
-   min-height: 100vh;
- }
-
- .wrap {
-   display: flex;
-   background-color: #fbfcfd;
-   max-width: 1728px;
-   flex-grow: 1;
-   height: fit-content;
- }
-
- .wrapSection {
-   margin: 25px;
-   width: 100%;
- }
-
- .leftAside {
-   background-color: #000000;
-   min-width: 229px;
-   flex-grow: 1;
- }
-
- .burger {
-   button {
-     display: none;
-
-     img {
-       padding: 12px 0 0 10px;
-     }
-
-   }
-
-   display: flex;
-   align-items: flex-start;
-   margin-bottom: 25px;
-   gap: 25px;
-
- }
-
- .title {
-   font-size: 30px;
-   font-weight: normal;
-   font-stretch: normal;
-   font-style: normal;
-   line-height: normal;
-   letter-spacing: normal;
-   color: #000;
- }
-
- .links {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   max-width: 1725px;
-   text-align: left;
-   margin-left: 25px;
-   margin-bottom: 25px;
-   text-transform: none;
-
-   a {
-     text-decoration: none;
-     color: #1253a2;
-     font-family: 'MyriadPro';
-     font-size: 16px;
-     font-weight: 600;
-   }
-
-   .secondLink {
-     margin-left: 20px;
-     margin-right: 25px;
-     text-transform: none;
-   }
- }
-
- .rightGroup {
-   position: relative;
-   max-height: 15px;
-   align-self: center;
-   margin-right: 15px;
-
-   button {
-     display: flex;
-     justify-content: space-between;
-     gap: 5px;
-     background-color: rgba(255, 255, 255, 0);
-     border: none;
-     height: 15px;
-   }
- }
-
- .listOptions {
-   position: absolute;
-   top: 20px;
-   right: 0px;
-   width: max-content;
-   display: flex;
-   flex-direction: column;
-   align-items: flex-end;
-   border: 1px solid black;
-   border-radius: 5px;
-   background-color: #fff;
-   z-index: 1;
-
-   .wrapButtonColumnMenu {
-     position: relative;
-
-     .listColumn {
-       display: flex;
-       flex-direction: column;
-       align-items: flex-start;
-       position: absolute;
-       top: 30px;
-       right: 0;
-       min-width: max-content;
-       background-color: #fff;
-       border: 1px solid black;
-       z-index: 2;
-       padding: 7px;
-       gap: 5px;
-       border-radius: 5px;
-
-       label {
-         pointer-events: none;
-       }
-     }
-   }
-
-   .buttonColumnMenu {
-     position: relative;
-     width: 100%;
-     height: fit-content;
-     padding: 7px;
-     font-size: 14px;
-     display: flex;
-     align-items: center;
-     // .{} 
-   }
- }
-
- .buttonColumnMenu:hover {
-   background-color: #eef3f8;
- }
-
- .newRow {
-   max-width: 1449px;
-   padding: 20px 0 20px 25px;
-   border-radius: 10px;
-   box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.07);
-   border: solid 1px var(--pale-grey);
-   background-color: #fff;
-   text-align: left;
- }
-
- .adderRow {
-   color: #ffffff;
-   padding: 10px 15px 10px;
-   border-radius: 5px;
-   background-color: #2f8cff;
-   border: none;
-   font-family: 'MyriadPro';
-   font-size: 14px;
- }
-
- .plus {
-   color: #1253a2;
-   padding-right: 7px;
-   height: 11px;
- }
-
- .wrapTable {
-   margin-top: 25px;
-   background-color: #fff;
-   width: 100%;
-   border-radius: 10px;
-   box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.07);
-   border: solid 1px #fff;
- }
-
- .redactTable {
-   display: flex;
-   align-items: center;
-   justify-content: flex-end;
-   margin: 10px 0 15px;
-   gap: 20px;
- }
-
- .buttonsWithoutBorder {
-   border: none;
-   color: #a6b7d4;
-   background-color: unset;
- }
-
- .mobileBlock {
-   display: none;
- }
-
- .wrapResult {
-   display: flex;
-   justify-content: flex-end;
-   width: 100%;
-   margin-top: 15px;
-   margin-bottom: 25px;
-
- }
-
- .wrapResult_right {
-   min-width: 304px;
-   min-height: 10px;
-   display: flex;
-   flex-direction: column;
-   font-size: 14px;
-   font-weight: normal;
-   font-stretch: normal;
-   font-style: normal;
-   line-height: normal;
-   letter-spacing: normal;
-   color: #8f8f8f;
-   gap: 5px;
-   margin-right: 15px;
-
-   .preResult {
-     min-width: 304px;
-     border-radius: 5px;
-     display: flex;
-     flex-direction: column;
-     border: solid 1px #eeeff1;
-     background-color: #fbfcfd;
-     padding: 15px;
-     gap: 15px;
-   }
- }
-
- .rowForSumm {
-   display: flex;
-   justify-content: space-between;
-
- }
-
- .summ {
-   color: #000;
- }
-
- .ag-root-wrapper-body.ag-layout-normal {
-   height: 100%;
- }
-
- .ag-cell-value {
-   text-overflow: clip;
- }
-
- @media screen and (max-width: 800px) {
-   .leftAside {
-     display: none;
-   }
- }
-
- @media screen and (max-width: 650px) {
-
-   .wrap {
-     margin: 16px 10px 0;
-     font-family: "MyriadPro";
-   }
-
-   .wrapSection {
-     margin: 0;
-   }
-
-   .burger {
-     button {
-       display: contents;
-     }
-
-     .title {
-       font-size: 30px;
-     }
-   }
-
-   .links {
-     margin-left: 0;
-   }
-
-   .rightGroup,
-   .redactTable {
-     display: none;
-   }
-
-   .ag-theme-quartz {
-     display: none;
-   }
-
-   .mobileBlock {
-     display: flex;
-     flex-direction: column;
-   }
-
-   .mobileBlockItem {
-     align-self: flex-start;
-     padding: 15px 15px 25px;
-     border-radius: 10px;
-     box-shadow: 0 5px 20px 0 rgba(0, 0, 0, 0.07);
-     border: solid 1px var(--pale-grey);
-     background-color: #fff;
-     gap: 15px;
-     display: flex;
-     flex-direction: column;
-     width: 100%;
-     box-sizing: border-box;
-     h6 {
-       font-size: 10px;
-       color: #8f8f8f;
-       margin-bottom: 5px;
-     }
-   }
-
-   .mobileBlockDoing {
-     position: relative;
-   }
-
-   .windowDoing {
-     position: absolute;
-     bottom: -33px;
-     left: 0;
-     z-index: 3;
-
-     button {
-       padding: 7px;
-       min-width: 179px;
-       color: #ae0a0a;
-       font-size: 14px;
-       text-align: left;
-       border-radius: 5px;
-       box-shadow: 0 0 3px 0 #000, inset 0 1px 2px 0 rgba(255, 255, 255, 0.5);
-       background-color: #fff;
-     }
-   }
-
-   .burgerButton {
-     border: none;
-     margin-right: 5px;
-   }
-
-   .burgerButton_colorBlue {
-     color: #1253a2;
-   }
-
-   .mobileBlockRow {
-     &_select {
-       padding: 10px 0 10px 15px;
-       width: 100%;
-       border-radius: 5px;
-       border: solid 1px #ccc;
-       background-color: #fff;
-       font-size: 16px;
-       font-family: "MyriadPro";
-       box-sizing: border-box;
-     }
-   }
-
-   .wrapResult {
-     margin-top: 25px;
-
-     .preResult {
-       font-size: 16px;
-     }
-   }
-
-   .active {
-
-     border-top: 3px dotted #000000;
-   }
-
-
- }
-</style> 
+}  
+</script>  
+ 
+<style lang="scss">
+@import "./Styles.scss";
+</style>  
