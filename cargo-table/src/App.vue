@@ -9,8 +9,8 @@
         <div class="wrapTable">
           <RedactTable :listMenu="listMenu" @sendDataToServer="sendDataToServer" @onGridReady="onGridReady" @onRowDataShower="onRowDataShower" ></RedactTable>
           <AgGridVue class="ag-theme-quartz" style="min-width: max-content;" :rowData="rowData"
-            :columnDefs="listMenu[0].listColumns" :rowDragManaged="true" :onGridReady="onGridReady" :editable="true"
-            :enableCellChangeFlash="true" @visibleChanged="onRowDataShower" @RowDragEnd="onRowDragEnd" >
+            :columnDefs="listMenu[0].listColumns" :suppressRowTransform= "true" :rowDragManaged="true" :onGridReady="onGridReady" :editable="true"
+            :enableCellChangeFlash="true" @visibleChanged="onRowDataShower" @RowDragEnd="onRowDragEnd" @cell-value-changed="onCellValueChanged" >
             <!-- // подавляет анимацию перемещения строк и делает линию между строк, куда вставиться перемещеамая строка// :suppressMoveWhenRowDragging=true>  -->
           </AgGridVue>
           <MobileBlock :rowData="rowData" :options="options" @delRow="delRow"></MobileBlock>
@@ -87,7 +87,11 @@ export default {
       this.rowData.splice(index, 1)
       return this.rowData = [...this.rowData]
     },
+    onCellValueChanged(){
+this.rowData=[...this.rowData]
+    }
   },
+  
   mounted() {
     const mq = window.matchMedia('(max-width: 600px)');
     mq.addEventListener('change', () => this.rowData = [...this.rowData]);
@@ -115,7 +119,7 @@ export default {
         filter: false,
         sortable: false,
         cellEditor: 'agSelectCellEditor',
-        flex: 2.1,
+        flex: 2,
         hide: false,
         singleClickEdit: true,
         onCellValueChanged: (params) => {
@@ -164,7 +168,7 @@ export default {
       },
       {
         field: "Действие",
-        flex: 0.8,
+        flex: 1,
         cellRenderer: (params) => {
           let button = document.createElement("button")
           button.innerHTML = 'Del'
