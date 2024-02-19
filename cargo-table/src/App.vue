@@ -3,75 +3,18 @@
     <div class="wrap">
       <aside class="leftAside"></aside>
       <section class="wrap_section">
-        <div class="burger">
-          <button>
-            <img src="./assets/svg/burger.svg" alt="burgerImg">
-          </button>
-          <h1 class="title">Проведение ТО и мелкий ремонт</h1>
-        </div>
-        <div class="links">
-          <div class="links_leftGroup">
-            <a href="#">Общее</a>
-            <a class="links_leftGroup__secondLink" href="#">Товары</a>
-            <a href="#">Доп. расходы</a>
-          </div>
-          <div class="links_rightGroup">
-            <button class="buttonMenu">
-              <img src="./assets/svg/combined-shape.svg" alt="settingsIcon">
-            </button>
-          </div>
-        </div>
-        <div class="newRow">
-          <button class="adderRow" @click="addNewRow"><span class="plus">+</span> Добавить строку</button>
-        </div>
+        <BurgerMenu></BurgerMenu>
+        <LinksMenu></LinksMenu>
+        <NewRowAdder @addNewRow="addNewRow"></NewRowAdder>
         <div class="wrapTable">
-          <RedactTable :listMenu="listMenu" @showListMenu="showListMenu" @onRowDataUpdated="onRowDataUpdated"></RedactTable>
+          <RedactTable :listMenu="listMenu" @sendDataToServer="sendDataToServer" @onGridReady="onGridReady" @onRowDataShower="onRowDataShower" ></RedactTable>
           <AgGridVue class="ag-theme-quartz" style="min-width: max-content;" :rowData="rowData"
             :columnDefs="listMenu[0].listColumns" :rowDragManaged="true" :onGridReady="onGridReady" :editable="true"
-            :enableCellChangeFlash="true" @visibleChanged="onRowDataUpdated" @RowDragEnd="onRowDragEnd">
+            :enableCellChangeFlash="true" @visibleChanged="onRowDataShower" @RowDragEnd="onRowDragEnd" >
             <!-- // подавляет анимацию перемещения строк и делает линию между строк, куда вставиться перемещеамая строка// :suppressMoveWhenRowDragging=true>  -->
           </AgGridVue>
           <MobileBlock :rowData="rowData" :options="options" @delRow="delRow"></MobileBlock>
-          <div class="wrapResult">
-            <div class="wrapResult_right">
-              <div class="preResult">
-                <div class="rowForSumm">
-                  <div>
-                    Сумма:
-                  </div>
-                  <div>
-                    {{ summCosts }}
-                  </div>
-                </div>
-                <div class="rowForSumm">
-                  <div>
-                    Кол-во:
-                  </div>
-                  <div>
-                    {{ summPoints }}
-                  </div>
-                </div>
-                <div class="rowForSumm">
-                  <div>
-                    Общий вес:
-                  </div>
-                  <div>
-                    {{ summWeights }}
-                  </div>
-                </div>
-              </div>
-              <div class="preResult">
-                <div class="rowForSumm summ">
-                  <div>
-                    Общая сумма:
-                  </div>
-                  <div>
-                    {{ summCosts }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <ResultBlock :rowData="rowData"></ResultBlock>
         </div>
       </section>
     </div>
@@ -79,12 +22,16 @@
 </template>  
  
 <script>
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import axios from 'axios';
-import { AgGridVue } from "ag-grid-vue3";
+import "ag-grid-community/styles/ag-grid.css"
+import "ag-grid-community/styles/ag-theme-quartz.css"
+import axios from 'axios'
+import { AgGridVue } from "ag-grid-vue3"
 import MobileBlock from "./components/MobileBlock.vue"
 import RedactTable from "./components/RedactTable.vue"
+import NewRowAdder from "./components/NewRowAdder.vue"
+import LinksMenu from "./components/LinksMenu.vue"
+import BurgerMenu from "./components/BurgerMenu.vue"
+import ResultBlock from "./components/ResultBlock.vue"
 export default {
   name: 'App',
   data() {
@@ -103,7 +50,7 @@ export default {
     }
   },
   components: {
-    AgGridVue, MobileBlock, RedactTable
+    AgGridVue, MobileBlock, RedactTable,NewRowAdder,LinksMenu,BurgerMenu,ResultBlock
   },
   methods: {
     addNewRow() {
@@ -116,8 +63,7 @@ export default {
     onGridReady(params) {
       this.gridApi = params.api;
     },
-  
-    onRowDataUpdated(field) {
+    onRowDataShower(field) {
       const columnDef = this.listMenu[0].listColumns.find((def) => def.field == field);
       columnDef.hide = !columnDef.hide;
       this.gridApi.setColumnDefs(this.listMenu[0].listColumns);
@@ -140,29 +86,6 @@ export default {
       const index = this.rowData.findIndex(e => e.id === id)
       this.rowData.splice(index, 1)
       return this.rowData = [...this.rowData]
-    },
-
-  },
-  computed: {
-    summCosts() {
-      if (this.rowData) {
-        return this.rowData.reduce((sum, el) => sum + el["Кол-во"] * el["Цена"], 0)
-      }
-      return 0
-    },
-    summPoints() {
-      if (this.rowData) {
-        return this.rowData.reduce((sum, el) => sum + el["Кол-во"], 0)
-      }
-      return 0
-    },
-    summWeights() {
-      if (this.rowData) {
-        return this.rowData.reduce((sum, el) =>
-          sum + (+el["Наименование единицы"].match(/\d+кг/i)[0].match(/\d+/i)) *
-          el["Кол-во"], 0)
-      }
-      return 0
     },
   },
   mounted() {
@@ -219,11 +142,11 @@ export default {
         },
       },
       {
-        field: "Цена", editable: true, cellEditor: 'agTextCellEditor',
+        field: "Цена", editable: true, cellEditor: 'agNumberCellEditor',
         singleClickEdit: true, hide: false, flex: 1
       },
       {
-        field: "Кол-во", editable: true, cellEditor: 'agTextCellEditor',
+        field: "Кол-во", editable: true, cellEditor: 'agNumberCellEditor',
         singleClickEdit: true, hide: false, flex: 1
       },
       {
@@ -269,7 +192,7 @@ export default {
         "Цена": 860, "Кол-во": 10, "Название товара": "Мраморный щебень", "Итого": "", doing: false,
       },
     ]
-  },
+  }
 }  
 </script>  
  

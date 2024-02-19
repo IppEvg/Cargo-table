@@ -1,10 +1,10 @@
 <template>
     <div class="redactTable">
         <div>
-            <button class="buttonsWithoutBorder" @click="sendDataToServer">Сохранить изменения</button>
+            <button class="buttonsWithoutBorder" @click="$emit('sendDataToServer')">Сохранить изменения</button>
         </div>
         <div class="links_rightGroup">
-            <button @click="() => showList = !showList" class="buttonMenu"><img src="../assets/svg/combined-shape.svg"
+            <button @click="() => this.showList = !this.showList" class="buttonMenu"><img src="../assets/svg/combined-shape.svg"
                     alt="settingsIcon">
             </button>
             <div v-show="showList" class="listOptions">
@@ -17,7 +17,7 @@
                         </button>
                         <div v-if="item.showListColumns" class="listColumn">
                             <div v-for="column in item.listColumns" :key="column.field">
-                                <input type="checkbox" id="idx" @change="$emit('onRowDataUpdated',column.field)" checked="true" />
+                                <input type="checkbox" id="idx" @change="$emit('onRowDataShower',column.field)" checked="true" />
                                 &nbsp;
                                 <label for=" idx">{{ column.field }}</label>
                             </div>
@@ -37,13 +37,8 @@ export default {
             showListNewColumns:false
         }
     },
-    props: ['listMenu'],
-    emits: ['onRowDataUpdated'],
-    methods: {
+    props: ['listMenu','columnDefs'],
+    emits: ['onRowDataShower','onGridReady'],
 
-    },
-    mounted() {
-
-    }
 }
 </script>
