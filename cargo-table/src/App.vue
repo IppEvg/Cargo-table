@@ -70,7 +70,7 @@ export default {
     },
     onRowDragEnd() {
       const columnDef = this.listMenu[0].listColumns.map((e, i) => e.index = i)
-      this.gridApi.setColumnDefs([...this.listMenu[0].listColumns, columnDef]);
+      this.gridApi.setColumnDefs([...this.listMenu[0].listColumns], columnDef);
     },
     sendDataToServer() {
       const data = { key: 'value' }
