@@ -25,7 +25,7 @@
           <button class="adderRow" @click="addNewRow"><span class="plus">+</span> Добавить строку</button>
         </div>
         <div class="wrapTable">
-          <RedactTable :listMenu="listMenu" @showListMenu="showListMenu"></RedactTable>
+          <RedactTable :listMenu="listMenu" @showListMenu="showListMenu" @onRowDataUpdated="onRowDataUpdated"></RedactTable>
           <AgGridVue class="ag-theme-quartz" style="min-width: max-content;" :rowData="rowData"
             :columnDefs="listMenu[0].listColumns" :rowDragManaged="true" :onGridReady="onGridReady" :editable="true"
             :enableCellChangeFlash="true" @visibleChanged="onRowDataUpdated" @RowDragEnd="onRowDragEnd">
@@ -89,12 +89,11 @@ export default {
   name: 'App',
   data() {
     return {
-      listMenu: [{
-        name: 'Отображение столбцов ',
-        showListColumns: false,
-        listColumns: []
-      },
-      { name: "Порядок столбцов ", showListColumns: false, listColumns: [] }
+      listMenu: [
+        {name: 'Отображение столбцов ',
+        listColumns: []},
+        { name: "Порядок столбцов ", 
+        showListColumns: false, listColumns: [] }
       ],
       rowData: null,
       options: ["Мраморный щебень фр. 30 мм, 40кг",
@@ -117,9 +116,7 @@ export default {
     onGridReady(params) {
       this.gridApi = params.api;
     },
-    showListNewColumns(item) {
-      item.showListColumns = !item.showListColumns
-    },
+  
     onRowDataUpdated(field) {
       const columnDef = this.listMenu[0].listColumns.find((def) => def.field == field);
       columnDef.hide = !columnDef.hide;
