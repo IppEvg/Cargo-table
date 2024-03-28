@@ -15,7 +15,7 @@
                 <button class="burgerButton burgerButton_colorBlue ">
                     <img src="../assets/svg/Combined Shape2.svg" alt="burgerImg">
                 </button>
-                <div v-show="item.doing" class="windowDoing ">
+                <div v-show="item.doing" class="windowDoing">
                     <button @click="delRow(item.id)">Удалить</button>
                 </div>
             </div>

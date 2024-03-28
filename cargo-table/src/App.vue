@@ -74,7 +74,7 @@ export default {
     },
     sendDataToServer() {
       const data = { key: 'value' }
-      axios.post('.....', data)
+      axios.post('...', data)
         .then(response => {
           console.log(response.data)
         })
@@ -93,6 +93,16 @@ this.rowData=[...this.rowData]
   },
   
   mounted() {
+    //Изначально грузим данные из API, которого нет в нашем случае. 
+    // axios
+    //   .get('...')
+    //   .then(response => {
+    //     this.listMenu = response.data
+    //   })
+    //   .catch(error => {
+    //     console.log(error);
+    //   })
+      //
     const mq = window.matchMedia('(max-width: 600px)');
     mq.addEventListener('change', () => this.rowData = [...this.rowData]);
 
@@ -101,17 +111,10 @@ this.rowData=[...this.rowData]
         field: 'Индекс',
         hide: false,
         headerName: '',
-        width: 50,
+        width: 70,
+        rowDrag: true,
         editable: false,
         valueGetter: params => params.node.rowIndex + 1,
-      },
-      {
-        field: "Перемещение",
-        hide: false,
-        editable: false,
-        headerName: '',
-        rowDrag: true,
-        width: 50,
       },
       {
         field: "Наименование единицы",
