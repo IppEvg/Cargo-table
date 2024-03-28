@@ -9,6 +9,5 @@
 <script>
 export default {
     name:'BurgerMenu',
-
 }
 </script>

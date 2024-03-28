@@ -15,7 +15,7 @@
                             <div v-if="!item.showListColumns">&gt;</div>
                             <div v-else> &lt;</div>
                         </button>
-                        <div v-if="item.showListColumns" class="listColumn">
+                        <div v-if="item.showListColumns&&item.listColumns.length>0" class="listColumn">
                             <div v-for="column in item.listColumns" :key="column.field">
                                 <input type="checkbox" id="idx" @change="$emit('onRowDataShower',column.field)" checked="true" />
                                 &nbsp;
